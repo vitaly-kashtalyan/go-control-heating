@@ -1,0 +1,8 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+    restart: always
+    container_name: control_heating_app
+    tty: true
