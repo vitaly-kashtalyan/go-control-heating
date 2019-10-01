@@ -1,0 +1,104 @@
+{
+  "status": 200,
+  "message": "OK",
+  "data": [
+    {
+      "pin": 46,
+      "dec": "",
+      "temperature": 24.9,
+      "humidity": 57.6,
+      "date": "2019-09-30T10:19:05+03:00"
+    },
+    {
+      "pin": 47,
+      "dec": "",
+      "temperature": 23.6,
+      "humidity": 57.8,
+      "date": "2019-09-30T10:19:05+03:00"
+    },
+    {
+      "pin": 48,
+      "dec": "",
+      "temperature": 23.8,
+      "humidity": 59.3,
+      "date": "2019-09-30T10:19:05+03:00"
+    },
+    {
+      "pin": 49,
+      "dec": "",
+      "temperature": 23.1,
+      "humidity": 65.5,
+      "date": "2019-09-30T10:19:06+03:00"
+    },
+    {
+      "pin": 50,
+      "dec": "",
+      "temperature": 25.2,
+      "humidity": 56.6,
+      "date": "2019-09-30T10:19:06+03:00"
+    },
+    {
+      "pin": 51,
+      "dec": "",
+      "temperature": 23.8,
+      "humidity": 44.4,
+      "date": "2019-09-30T10:19:06+03:00"
+    },
+    {
+      "pin": 53,
+      "dec": "",
+      "temperature": 24.5,
+      "humidity": 45.3,
+      "date": "2019-09-30T10:19:07+03:00"
+    },
+    {
+      "pin": 7,
+      "dec": "28ff10023e040022",
+      "temperature": 25.62,
+      "humidity": 0,
+      "date": "2019-09-30T10:19:07+03:00"
+    },
+    {
+      "pin": 7,
+      "dec": "28ff89023b040053",
+      "temperature": 23.44,
+      "humidity": 0,
+      "date": "2019-09-30T10:19:07+03:00"
+    },
+    {
+      "pin": 7,
+      "dec": "28ff49083c040010",
+      "temperature": 26.38,
+      "humidity": 0,
+      "date": "2019-09-30T10:19:08+03:00"
+    },
+    {
+      "pin": 7,
+      "dec": "28ff45023e040065",
+      "temperature": 24.38,
+      "humidity": 0,
+      "date": "2019-09-30T10:19:08+03:00"
+    },
+    {
+      "pin": 7,
+      "dec": "28ffc5013b040013",
+      "temperature": 27.06,
+      "humidity": 0,
+      "date": "2019-09-30T10:19:08+03:00"
+    },
+    {
+      "pin": 7,
+      "dec": "28ff03083c040044",
+      "temperature": 27.31,
+      "humidity": 0,
+      "date": "2019-09-30T10:19:08+03:00"
+    },
+    {
+      "pin": 7,
+      "dec": "28ff17083c040027",
+      "temperature": 25.31,
+      "humidity": 0,
+      "date": "2019-09-30T10:19:09+03:00"
+    }
+  ]
+}

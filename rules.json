@@ -44,15 +44,15 @@
     },
     {
       "pin": 7,
-      "dec": "28ff49083c040010",
-      "temperature": 26,
+      "dec": "28ff17083c040027",
+      "temperature": 26.5,
       "relay": 2,
       "name": "kitchen"
     },
     {
       "pin": 7,
       "dec": "28ff10023e040022",
-      "temperature": 27,
+      "temperature": 28,
       "relay": 4,
       "name": "bathroom"
     },
@@ -65,7 +65,7 @@
     },
     {
       "pin": 7,
-      "dec": "28ff17083c040027",
+      "dec": "28ff49083c040010",
       "temperature": 26,
       "relay": 8,
       "name": "airlock"
