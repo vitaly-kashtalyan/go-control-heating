@@ -43,7 +43,7 @@ type sensor struct {
 
 func main() {
 	s := gocron.NewScheduler()
-	s.Every(3).Minutes().Do(manageRelays)
+	s.Every(1).Minute().Do(manageRelays)
 	<-s.Start()
 }
 

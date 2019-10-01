@@ -10,7 +10,7 @@
     {
       "pin": 47,
       "dec": "",
-      "temperature": 23,
+      "temperature": 23.5,
       "relay": 13,
       "name": "kid's room - I"
     },
@@ -24,21 +24,21 @@
     {
       "pin": 49,
       "dec": "",
-      "temperature": 23,
+      "temperature": 22.5,
       "relay": 9,
       "name": "kid's room - E"
     },
     {
       "pin": 51,
       "dec": "",
-      "temperature": 23,
+      "temperature": 22,
       "relay": 5,
       "name": "living room"
     },
     {
       "pin": 53,
       "dec": "",
-      "temperature": 23,
+      "temperature": 21,
       "relay": 7,
       "name": "kitchen"
     },
