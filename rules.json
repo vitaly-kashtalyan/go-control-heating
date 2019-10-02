@@ -31,7 +31,7 @@
     {
       "pin": 51,
       "dec": "",
-      "temperature": 22,
+      "temperature": 24,
       "relay": 5,
       "name": "living room"
     },
@@ -72,14 +72,14 @@
     },
     {
       "pin": 7,
-      "dec": "28ff89023b040053",
-      "temperature": 26,
+      "dec": "28ff03083c040044",
+      "temperature": 25,
       "relay": 10,
       "name": "closet"
     },
     {
       "pin": 7,
-      "dec": "28ff03083c040044",
+      "dec": "28ff89023b040053",
       "temperature": 25,
       "relay": 14,
       "name": "living room - left"
