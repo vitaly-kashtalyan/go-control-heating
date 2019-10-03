@@ -17,14 +17,14 @@
     {
       "pin": 48,
       "dec": "",
-      "temperature": 23,
+      "temperature": 23.25,
       "relay": 11,
       "name": "bedroom"
     },
     {
       "pin": 49,
       "dec": "",
-      "temperature": 22.5,
+      "temperature": 23,
       "relay": 9,
       "name": "kid's room - E"
     },
@@ -52,7 +52,7 @@
     {
       "pin": 7,
       "dec": "28ff10023e040022",
-      "temperature": 27,
+      "temperature": 27.25,
       "relay": 4,
       "name": "bathroom"
     },
@@ -66,28 +66,28 @@
     {
       "pin": 7,
       "dec": "28ff49083c040010",
-      "temperature": 26,
+      "temperature": 27,
       "relay": 8,
       "name": "airlock"
     },
     {
       "pin": 7,
       "dec": "28ff03083c040044",
-      "temperature": 22,
+      "temperature": 24,
       "relay": 10,
       "name": "closet"
     },
     {
       "pin": 7,
       "dec": "28ff89023b040053",
-      "temperature": 24,
+      "temperature": 25,
       "relay": 14,
       "name": "living room - left"
     },
     {
       "pin": 7,
       "dec": "28ff45023e040065",
-      "temperature": 22,
+      "temperature": 24,
       "relay": 12,
       "name": "living room - right"
     }
