@@ -41,6 +41,12 @@ type sensor struct {
 	CreatedAt   time.Time `json:"date"`
 }
 
+type RelayStatus struct {
+	Status  int         `json:"status"`
+	Message string      `json:"message"`
+	Data    map[int]int `json:"data"`
+}
+
 func main() {
 	s := gocron.NewScheduler()
 	s.Every(1).Minute().Do(manageRelays)
@@ -65,6 +71,21 @@ func manageRelays() {
 	} else {
 		fmt.Printf("manageRelays: %v", err)
 	}
+	_ = sendRelayStatus(0, getFloorState())
+}
+
+func getFloorState() string {
+	relayStatus := RelayStatus{}
+	if err := getJSON("http://192.168.0.8:8082/status", &relayStatus); err == nil {
+		if relayStatus.Status == http.StatusOK {
+			for key, num := range relayStatus.Data {
+				if key%2 == 0 && key > 0 && num == 1 {
+					return ENABLE
+				}
+			}
+		}
+	}
+	return DISABLE
 }
 
 func sendRelayStatus(relayId int, status string) error {
