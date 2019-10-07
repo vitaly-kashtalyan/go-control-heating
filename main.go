@@ -59,6 +59,7 @@ func manageRelays() {
 		if sensors.Message == "OK" {
 			for _, v := range sensors.Data {
 				relayId, temperature := getRuleByPinAndDec(v.Pin, v.DecSensor)
+				fmt.Println("relayId:", relayId, "; t:", temperature, "; [", v.Temperature, "<", temperature, "]")
 				if relayId != -1 || temperature != -1 {
 					statusRelay := DISABLE
 					if v.Temperature < temperature {
