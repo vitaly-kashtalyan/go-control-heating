@@ -3,93 +3,106 @@
     {
       "pin": 46,
       "dec": "",
-      "temperature": 25,
+      "temperature": 23,
       "relay": 15,
-      "name": "bathroom"
+      "name": "Bathroom",
+      "enable": false
     },
     {
       "pin": 47,
       "dec": "",
-      "temperature": 23.25,
+      "temperature": 23,
       "relay": 13,
-      "name": "kid's room - I"
+      "name": "Ilya's room",
+      "enable": false
     },
     {
       "pin": 48,
       "dec": "",
-      "temperature": 22.75,
+      "temperature": 23,
       "relay": 11,
-      "name": "bedroom"
+      "name": "Bedroom",
+      "enable": false
     },
     {
       "pin": 49,
       "dec": "",
-      "temperature": 22.75,
+      "temperature": 23,
       "relay": 9,
-      "name": "kid's room - E"
+      "name": "Elisey's room",
+      "enable": false
     },
     {
       "pin": 51,
       "dec": "",
-      "temperature": 22.5,
+      "temperature": 23,
       "relay": 5,
-      "name": "living room"
+      "name": "Living room",
+      "enable": false
     },
     {
       "pin": 53,
       "dec": "",
-      "temperature": 22,
+      "temperature": 23,
       "relay": 7,
-      "name": "kitchen"
+      "name": "Kitchen",
+      "enable": false
     },
     {
       "pin": 7,
       "dec": "28ff17083c040027",
-      "temperature": 26.25,
+      "temperature": 22,
       "relay": 2,
-      "name": "kitchen"
+      "name": "Kitchen",
+      "enable": false
     },
     {
       "pin": 7,
       "dec": "28ff10023e040022",
-      "temperature": 27.75,
+      "temperature": 22,
       "relay": 4,
-      "name": "bathroom"
+      "name": "Bathroom",
+      "enable": false
     },
     {
       "pin": 7,
       "dec": "28ffc5013b040013",
       "temperature": 22,
       "relay": 6,
-      "name": "hall"
+      "name": "Hall",
+      "enable": false
     },
     {
       "pin": 7,
       "dec": "28ff49083c040010",
-      "temperature": 27.25,
+      "temperature": 23,
       "relay": 8,
-      "name": "airlock"
+      "name": "Airlock",
+      "enable": false
     },
     {
       "pin": 7,
       "dec": "28ff03083c040044",
-      "temperature": 26,
+      "temperature": 23,
       "relay": 10,
-      "name": "closet"
+      "name": "Closet",
+      "enable": false
     },
     {
       "pin": 7,
       "dec": "28ff89023b040053",
-      "temperature": 26.5,
+      "temperature": 23,
       "relay": 14,
-      "name": "living room - left"
+      "name": "Living room - left",
+      "enable": false
     },
     {
       "pin": 7,
       "dec": "28ff45023e040065",
-      "temperature": 26,
+      "temperature": 23,
       "relay": 12,
-      "name": "living room - right"
+      "name": "Living room - right",
+      "enable": false
     }
   ]
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/jasonlvhit/gocron"
 	"io/ioutil"
 	"net/http"
@@ -11,8 +12,9 @@ import (
 )
 
 const (
-	ENABLE  = "on"
-	DISABLE = "off"
+	ENABLE    = "on"
+	DISABLE   = "off"
+	RulesFile = "rules.json"
 )
 
 type Relays struct {
@@ -25,6 +27,15 @@ type relay struct {
 	Temperature float32 `json:"temperature"`
 	Relay       int     `json:"relay"`
 	Name        string  `json:"name"`
+	Enable      bool    `json:"enable"`
+}
+
+type relayPatch struct {
+	Pin         int     `json:"pin" binding:"required"`
+	DecSensor   string  `json:"dec"`
+	Temperature float32 `json:"temperature,omitempty"`
+	Name        string  `json:"name,omitempty"`
+	Enable      *bool   `json:"enable"`
 }
 
 type Sensors struct {
@@ -48,9 +59,44 @@ type RelayStatus struct {
 }
 
 func main() {
-	s := gocron.NewScheduler()
-	s.Every(1).Minute().Do(manageRelays)
-	<-s.Start()
+	r := gin.Default()
+	r.GET("/rules", func(c *gin.Context) {
+		c.JSON(http.StatusOK, getRelays())
+	})
+
+	r.PATCH("/rules", func(c *gin.Context) {
+		_ = updateRelayFields(c)
+		c.JSON(http.StatusNoContent, nil)
+	})
+
+	go func() {
+		gocron.Every(1).Minute().Do(manageRelays)
+		<-gocron.Start()
+	}()
+	_ = r.Run(":8083")
+}
+
+func updateRelayFields(c *gin.Context) error {
+	relays := getRelays()
+	var jsonBody relayPatch
+	if err := c.BindJSON(&jsonBody); err == nil {
+		for i := range relays.Relay {
+			if jsonBody.Pin == relays.Relay[i].Pin && jsonBody.DecSensor == relays.Relay[i].DecSensor {
+				if jsonBody.Name != "" {
+					relays.Relay[i].Name = jsonBody.Name
+				}
+				if jsonBody.Temperature != 0 {
+					relays.Relay[i].Temperature = jsonBody.Temperature
+				}
+				if jsonBody.Enable != nil {
+					relays.Relay[i].Enable = *jsonBody.Enable
+				}
+			}
+		}
+		return writeObjectToJson(relays)
+	} else {
+		return err
+	}
 }
 
 func manageRelays() {
@@ -58,11 +104,11 @@ func manageRelays() {
 	if err := getJSON("http://192.168.0.8:8084", &sensors); err == nil {
 		if sensors.Message == "OK" {
 			for _, v := range sensors.Data {
-				relayId, temperature := getRuleByPinAndDec(v.Pin, v.DecSensor)
-				fmt.Println("relayId:", relayId, "; t:", temperature, "; [", v.Temperature, "<", temperature, "]")
+				relayId, temperature, enable := getRuleByPinAndDec(v.Pin, v.DecSensor)
+				fmt.Println("relayId:", relayId, "; enable:", enable, "; [", v.Temperature, "<", temperature, "]")
 				if relayId != -1 || temperature != -1 {
 					statusRelay := DISABLE
-					if v.Temperature < temperature {
+					if v.Temperature < temperature && enable {
 						statusRelay = ENABLE
 					}
 					_ = sendRelayStatus(relayId, statusRelay)
@@ -104,8 +150,18 @@ func sendRelayStatus(relayId int, status string) error {
 	return nil
 }
 
-func getRuleByPinAndDec(pin int, dec string) (int, float32) {
-	jsonFile, err := os.Open("rules.json")
+func getRuleByPinAndDec(pin int, dec string) (int, float32, bool) {
+	relays := getRelays()
+	for i := 0; i < len(relays.Relay); i++ {
+		if pin == relays.Relay[i].Pin && dec == relays.Relay[i].DecSensor {
+			return relays.Relay[i].Relay, relays.Relay[i].Temperature, relays.Relay[i].Enable
+		}
+	}
+	return -1, -1, false
+}
+
+func getRelays() Relays {
+	jsonFile, err := os.Open(RulesFile)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -114,13 +170,7 @@ func getRuleByPinAndDec(pin int, dec string) (int, float32) {
 
 	var relays Relays
 	_ = json.Unmarshal(byteValue, &relays)
-
-	for i := 0; i < len(relays.Relay); i++ {
-		if pin == relays.Relay[i].Pin && dec == relays.Relay[i].DecSensor {
-			return relays.Relay[i].Relay, relays.Relay[i].Temperature
-		}
-	}
-	return -1, -1
+	return relays
 }
 
 func getJSON(url string, result interface{}) error {
@@ -138,4 +188,9 @@ func getJSON(url string, result interface{}) error {
 		return fmt.Errorf("cannot decode JSON: %v", err)
 	}
 	return nil
+}
+
+func writeObjectToJson(data interface{}) error {
+	file, _ := json.MarshalIndent(data, "", " ")
+	return ioutil.WriteFile(RulesFile, file, 0644)
 }
