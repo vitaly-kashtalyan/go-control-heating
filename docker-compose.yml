@@ -5,4 +5,6 @@ services:
       context: .
     restart: always
     container_name: control_heating_app
+    ports:
+      - 8083:8083
     tty: true
