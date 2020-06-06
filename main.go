@@ -30,6 +30,15 @@ type relay struct {
 	Enable      bool    `json:"enable"`
 }
 
+type RelaysWithSensors struct {
+	Relay []RelayWithSensor `json:"relays"`
+}
+
+type RelayWithSensor struct {
+	relay
+	Sensor sensor `json:"sensor"`
+}
+
 type relayPatch struct {
 	Pin         int     `json:"pin" binding:"required"`
 	DecSensor   string  `json:"dec"`
@@ -49,7 +58,8 @@ type sensor struct {
 	DecSensor   string    `json:"dec"`
 	Temperature float32   `json:"temperature"`
 	Humidity    float32   `json:"humidity"`
-	CreatedAt   time.Time `json:"date"`
+	CreatedAt   time.Time `json:"create_at"`
+	UpdatedAt   time.Time `json:"update_at"`
 }
 
 type RelayStatus struct {
@@ -60,6 +70,11 @@ type RelayStatus struct {
 
 func main() {
 	r := gin.Default()
+
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, getRelaysWithSensor())
+	})
+
 	r.GET("/rules", func(c *gin.Context) {
 		c.JSON(http.StatusOK, getRelays())
 	})
@@ -100,23 +115,19 @@ func updateRelayFields(c *gin.Context) error {
 }
 
 func manageRelays() {
-	sensors := Sensors{}
-	if err := getJSON("http://192.168.0.8:8084", &sensors); err == nil {
-		if sensors.Message == "OK" {
-			for _, v := range sensors.Data {
-				relayId, temperature, enable := getRuleByPinAndDec(v.Pin, v.DecSensor)
-				fmt.Println("relayId:", relayId, "; enable:", enable, "; [", v.Temperature, "<", temperature, "]")
-				if relayId != -1 || temperature != -1 {
-					statusRelay := DISABLE
-					if v.Temperature < temperature && enable {
-						statusRelay = ENABLE
-					}
-					_ = sendRelayStatus(relayId, statusRelay)
+	sensors := getSensors()
+	if sensors.Message == "OK" {
+		for _, v := range sensors.Data {
+			relayId, temperature, enable := getRuleByPinAndDec(v.Pin, v.DecSensor)
+			fmt.Println("relayId:", relayId, "; enable:", enable, "; [", v.Temperature, "<", temperature, "]")
+			if relayId != -1 || temperature != -1 {
+				statusRelay := DISABLE
+				if v.Temperature < temperature && enable {
+					statusRelay = ENABLE
 				}
+				_ = sendRelayStatus(relayId, statusRelay)
 			}
 		}
-	} else {
-		fmt.Printf("manageRelays: %v", err)
 	}
 	_ = sendRelayStatus(0, getFloorState())
 }
@@ -171,6 +182,30 @@ func getRelays() Relays {
 	var relays Relays
 	_ = json.Unmarshal(byteValue, &relays)
 	return relays
+}
+func getSensors() Sensors {
+	sensors := Sensors{}
+	if err := getJSON("http://192.168.0.8:8084", &sensors); err == nil {
+		return sensors
+	} else {
+		fmt.Printf("Error getting sensors data: %v", err)
+	}
+	return sensors
+}
+
+func getRelaysWithSensor() RelaysWithSensors {
+	var relayWithSensor []RelayWithSensor
+	relays := getRelays()
+	sensors := getSensors()
+
+	for i := 0; i < len(relays.Relay); i++ {
+		for _, v := range sensors.Data {
+			if v.Pin == relays.Relay[i].Pin && v.DecSensor == relays.Relay[i].DecSensor {
+				relayWithSensor = append(relayWithSensor, RelayWithSensor{relay: relays.Relay[i], Sensor: v})
+			}
+		}
+	}
+	return RelaysWithSensors{Relay: relayWithSensor}
 }
 
 func getJSON(url string, result interface{}) error {
