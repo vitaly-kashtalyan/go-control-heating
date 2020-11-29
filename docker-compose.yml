@@ -5,6 +5,8 @@ services:
       context: .
     restart: always
     container_name: control_heating_app
-    ports:
-      - 8083:8083
+    environment:
+      RELAYS_SERVICE_HOST: 192.168.0.8:8082
+      SENSORS_SERVICE_HOST: 192.168.0.8:8084
+      RULES_SERVICE_HOST: 192.168.0.8:8071
     tty: true
