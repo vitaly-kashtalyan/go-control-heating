@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/jasonlvhit/gocron"
@@ -70,6 +71,11 @@ type CircuitRelays struct {
 	} `json:"schedule"`
 }
 
+type Switcher struct {
+	ID     int    `json:"id" binding:"required"`
+	Switch string `json:"switch" binding:"required"`
+}
+
 func main() {
 	gocron.Every(1).Minute().Do(manageRelays)
 	<-gocron.Start()
@@ -127,15 +133,21 @@ func analyzeParentRelayStateOfCircuit(circuitRelays []CircuitRelays) string {
 }
 
 func sendRelayStatus(relayId int, status string) error {
-	url := fmt.Sprintf("http://"+getRelaysServiceHost()+"/relays/%s/%d", status, relayId)
-	fmt.Printf("GET: %s\n", url)
-	resp, err := http.Get(url)
+	uri := "http://" + getRelaysServiceHost() + "/relay"
+	switcher := Switcher{ID: relayId, Switch: status}
+	fmt.Printf("POST: %s BODY: %v", uri, switcher)
+	body := new(bytes.Buffer)
+	err := json.NewEncoder(body).Encode(switcher)
 	if err != nil {
-		return fmt.Errorf("cannot fetch URL %q: %v", url, err)
+		return fmt.Errorf("%q: %v", uri, err)
+	}
+	resp, err := http.Post(uri, "application/json; charset=utf-8", body)
+	if err != nil {
+		return fmt.Errorf("cannot fetch URL %q: %v", uri, err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected http GET status: %s", resp.Status)
+		return fmt.Errorf("unexpected http POST status: %s", resp.Status)
 	}
 
 	return nil
