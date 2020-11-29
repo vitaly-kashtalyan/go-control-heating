@@ -32,12 +32,10 @@ type Sensors struct {
 }
 
 type RelayStatus struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
-	Data    []struct {
+	Relay []struct {
 		ID    int `json:"id"`
 		State int `json:"state"`
-	} `json:"data"`
+	} `json:"relays"`
 }
 
 type Rules struct {
@@ -122,7 +120,7 @@ func analyzeParentRelayStateOfCircuit(circuitRelays []CircuitRelays) string {
 	relayStatus, err := getRelayStatus()
 	if err == nil {
 		for _, c := range circuitRelays {
-			for _, r := range relayStatus.Data {
+			for _, r := range relayStatus.Relay {
 				if c.RelayID == r.ID && r.State == 1 {
 					return ENABLE
 				}
@@ -178,7 +176,7 @@ func getCircuits() (rules Circuits, err error) {
 }
 
 func getRelayStatus() (relayStatus RelayStatus, err error) {
-	err = getJSON("http://"+getRelaysServiceHost(), &relayStatus)
+	err = getJSON("http://"+getRelaysServiceHost()+"/status", &relayStatus)
 	return
 }
 
