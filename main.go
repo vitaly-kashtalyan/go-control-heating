@@ -51,7 +51,7 @@ type Rules struct {
 type Circuits struct {
 	Circuit []struct {
 		Name           string          `json:"name"`
-		Temperature    int             `json:"temperature"`
+		Temperature    float32         `json:"temperature"`
 		ParentRelayID  int             `json:"parent_relay_id"`
 		CircuitsRelays []CircuitRelays `json:"relays"`
 	} `json:"circuits"`
@@ -113,6 +113,8 @@ func updateCircuitParentRelayStatus() {
 				fmt.Println("sendRelayStatus:", err)
 			}
 		}
+	} else {
+		fmt.Println("error getting Circuits:", err)
 	}
 }
 
