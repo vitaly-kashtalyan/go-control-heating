@@ -6,7 +6,7 @@ services:
     restart: always
     container_name: control_heating_app
     environment:
-      RELAYS_SERVICE_HOST: 192.168.0.8:8082
-      SENSORS_SERVICE_HOST: 192.168.0.8:8084
+      RELAYS_SERVICE_HOST: 192.168.0.8:8072
+      SENSORS_SERVICE_HOST: 192.168.0.8:8086
       RULES_SERVICE_HOST: 192.168.0.8:8071
     tty: true

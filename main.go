@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"github.com/jasonlvhit/gocron"
 	"net/http"
+	"net/url"
 	"os"
-	"time"
+	"reflect"
 )
 
 const (
@@ -19,16 +20,14 @@ const (
 )
 
 type Sensors struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
-	Data    []struct {
-		Pin         int       `json:"pin"`
-		Dec         string    `json:"dec"`
-		Temperature float32   `json:"temperature"`
-		Humidity    float32   `json:"humidity"`
-		CreateAt    time.Time `json:"create_at"`
-		UpdateAt    time.Time `json:"update_at"`
-	} `json:"data"`
+	Results []struct {
+		StatementID int `json:"statement_id"`
+		Series      []struct {
+			Name    string          `json:"name"`
+			Columns []string        `json:"columns"`
+			Values  [][]interface{} `json:"values"`
+		} `json:"series"`
+	} `json:"results"`
 }
 
 type RelayStatus struct {
@@ -80,15 +79,18 @@ func main() {
 }
 
 func manageRelays() {
-	sensors, errS := getSensors()
-	rules, errR := getRules()
-	if errS == nil && errR == nil {
-		for _, v := range sensors.Data {
-			relayId, temperature, enable := getRuleByPinAndDec(rules, v.Pin, v.Dec)
-			fmt.Println("relayId:", relayId, "; enable:", enable, "; [", v.Temperature, "<", temperature, "]")
-			if relayId != -1 || temperature != -1 {
+	rules, err := getRules()
+	if err == nil {
+		for _, r := range rules.RuleSensors {
+			currentTemp, err := getCurrentTemperatureByPinAndDec(r.Pin, r.Dec)
+			if err != nil {
+				fmt.Println("getSensors:", err)
+			}
+			relayId, temperature, enable := getRuleByPinAndDec(rules, r.Pin, r.Dec)
+			fmt.Println("relayId:", relayId, "; enable:", enable, "; [", currentTemp, "<", temperature, "]")
+			if relayId != -1 || temperature != -1 || currentTemp != -1 {
 				statusRelay := DISABLE
-				if v.Temperature < temperature && enable {
+				if currentTemp < temperature && enable {
 					statusRelay = ENABLE
 				}
 				err := sendRelayStatus(relayId, statusRelay)
@@ -98,10 +100,34 @@ func manageRelays() {
 			}
 		}
 	} else {
-		fmt.Println("getSensors:", errS)
-		fmt.Println("getRules:", errR)
+		fmt.Println("getRules:", err)
 	}
 	updateCircuitParentRelayStatus()
+}
+
+func getCurrentTemperatureByPinAndDec(pin int, dec string) (temp float32, err error) {
+	temp = -1
+	sensors, err := getSensors(pin, dec)
+	if err != nil {
+		return
+	}
+	t, err := getFloat(sensors.Results[0].Series[0].Values[0][1])
+	if err != nil {
+		return
+	} else {
+		temp = float32(t)
+	}
+	return
+}
+
+func getFloat(unk interface{}) (float64, error) {
+	v := reflect.ValueOf(unk)
+	v = reflect.Indirect(v)
+	if !v.Type().ConvertibleTo(reflect.TypeOf(float64(0))) {
+		return 0, fmt.Errorf("cannot convert %v to float64", v.Type())
+	}
+	fv := v.Convert(reflect.TypeOf(float64(0)))
+	return fv.Float(), nil
 }
 
 func updateCircuitParentRelayStatus() {
@@ -128,6 +154,8 @@ func analyzeParentRelayStateOfCircuit(circuitRelays []CircuitRelays) string {
 				}
 			}
 		}
+	} else {
+		fmt.Println("error getting RelayStatus:", err)
 	}
 	return DISABLE
 }
@@ -162,8 +190,15 @@ func getRuleByPinAndDec(rules Rules, pin int, dec string) (int, float32, bool) {
 	return -1, -1, false
 }
 
-func getSensors() (sensors Sensors, err error) {
-	err = getJSON("http://"+getSensorsServiceHost(), &sensors)
+func getSensors(pin int, dec string) (sensors Sensors, err error) {
+	var decParam = ""
+	if len(dec) != 0 {
+		decParam = " AND dec='" + dec + "'"
+	}
+	params := url.Values{}
+	params.Add("db", "telegraf")
+	params.Add("q", fmt.Sprintf("SELECT MOVING_AVERAGE(value,8) FROM climate_sensors WHERE (pin='%d'%s AND topic='home/sensors/temperature') ORDER BY time DESC LIMIT 1;", pin, decParam))
+	err = getJSON("http://"+getSensorsServiceHost()+"/query?"+params.Encode(), &sensors)
 	return
 }
 
