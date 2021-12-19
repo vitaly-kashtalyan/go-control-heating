@@ -47,6 +47,7 @@ jobs:
           # Note: tags has to be all lower-case
           tags: |
             wunzi/go-control-heating:latest
+            ghcr.io/vitaly-kashtalyan/go-control-heating:latest
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/main' }}
 
