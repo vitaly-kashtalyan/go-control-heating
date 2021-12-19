@@ -196,6 +196,8 @@ func getSensors(pin int, dec string) (sensors Sensors, err error) {
 		decParam = " AND dec='" + dec + "'"
 	}
 	params := url.Values{}
+	params.Add("u", "telegraf")
+	params.Add("p", "telegraf")
 	params.Add("db", "telegraf")
 	params.Add("q", fmt.Sprintf("SELECT MOVING_AVERAGE(value,8) FROM climate_sensors WHERE (pin='%d'%s AND topic='home/sensors/temperature') ORDER BY time DESC LIMIT 1;", pin, decParam))
 	err = getJSON("http://"+getSensorsServiceHost()+"/query?"+params.Encode(), &sensors)
