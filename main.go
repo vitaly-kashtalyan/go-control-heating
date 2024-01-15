@@ -182,7 +182,7 @@ func analyzeParentRelayStateOfCircuit(circuitRelays []CircuitRelays) string {
 func sendRelayStatus(relayId int, status string) error {
 	uri := "http://" + getRelaysServiceHost() + "/relay"
 	switcher := Switcher{ID: relayId, Switch: status}
-	log.Info("send POST: %s with body: %v\n", uri, switcher)
+	log.Info("send POST: "+uri+"; body=", switcher)
 	body := new(bytes.Buffer)
 	err := json.NewEncoder(body).Encode(switcher)
 	if err != nil {
