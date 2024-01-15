@@ -6,7 +6,7 @@ COPY . .
 RUN GOOS=linux GOARCH=amd64 go build -o main .
 
 
-FROM alpine:3.19
+FROM --platform=linux/amd64 alpine:3.19
 WORKDIR /root
 COPY --from=build /app/main .
 CMD ["./main"]

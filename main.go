@@ -88,9 +88,11 @@ func init() {
 			return "->", fmt.Sprintf("[%10s:%4d]", filepath.Base(f.File), f.Line)
 		},
 	})
+	log.Info("initialization application")
 }
 
 func main() {
+	log.Info("run cron job every minutes")
 	gocron.Every(1).Minute().Do(manageRelays)
 	<-gocron.Start()
 }
@@ -180,7 +182,7 @@ func analyzeParentRelayStateOfCircuit(circuitRelays []CircuitRelays) string {
 func sendRelayStatus(relayId int, status string) error {
 	uri := "http://" + getRelaysServiceHost() + "/relay"
 	switcher := Switcher{ID: relayId, Switch: status}
-	fmt.Printf("POST: %s BODY: %v\n", uri, switcher)
+	log.Info("send POST: %s with body: %v\n", uri, switcher)
 	body := new(bytes.Buffer)
 	err := json.NewEncoder(body).Encode(switcher)
 	if err != nil {
