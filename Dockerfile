@@ -1,9 +1,9 @@
-FROM golang:1.18-alpine AS build
+FROM --platform=linux/amd64 golang:1.18-alpine AS build
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN GOOS=linux go build -o main .
+RUN GOOS=linux GOARCH=amd64 go build -o main .
 
 
 FROM alpine:3.19
