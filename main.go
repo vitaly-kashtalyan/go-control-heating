@@ -5,10 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/jasonlvhit/gocron"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"reflect"
+	"runtime"
 )
 
 const (
@@ -73,6 +76,20 @@ type Switcher struct {
 	Switch string `json:"switch" binding:"required"`
 }
 
+func init() {
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.DebugLevel)
+	log.SetReportCaller(true)
+	log.SetFormatter(&log.TextFormatter{
+		ForceColors:     true,
+		FullTimestamp:   true,
+		TimestampFormat: "2006-01-02 15:04:05.000",
+		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
+			return "->", fmt.Sprintf("[%10s:%4d]", filepath.Base(f.File), f.Line)
+		},
+	})
+}
+
 func main() {
 	gocron.Every(1).Minute().Do(manageRelays)
 	<-gocron.Start()
@@ -84,10 +101,10 @@ func manageRelays() {
 		for _, r := range rules.RuleSensors {
 			currentTemp, err := getCurrentTemperatureByPinAndDec(r.Pin, r.Dec)
 			if err != nil {
-				fmt.Println("getSensors:", err)
+				log.Error("error reading sensors: ", err)
 			}
 			relayId, temperature, enable := getRuleByPinAndDec(rules, r.Pin, r.Dec)
-			fmt.Println("relayId:", relayId, "; enable:", enable, "; [", currentTemp, "<", temperature, "]")
+			log.Info("relayId:", relayId, "; enable:", enable, "; [", currentTemp, "<", temperature, "]")
 			if relayId != -1 || temperature != -1 || currentTemp != -1 {
 				statusRelay := DISABLE
 				if currentTemp < temperature && enable {
@@ -95,12 +112,12 @@ func manageRelays() {
 				}
 				err := sendRelayStatus(relayId, statusRelay)
 				if err != nil {
-					fmt.Println("sendRelayStatus:", err)
+					log.Error("error sending relay status: ", err)
 				}
 			}
 		}
 	} else {
-		fmt.Println("getRules:", err)
+		log.Error("error parsing rules: ", err)
 	}
 	updateCircuitParentRelayStatus()
 }
@@ -136,11 +153,11 @@ func updateCircuitParentRelayStatus() {
 		for _, c := range circuits.Circuit {
 			err = sendRelayStatus(c.ParentRelayID, analyzeParentRelayStateOfCircuit(c.CircuitsRelays))
 			if err != nil {
-				fmt.Println("sendRelayStatus:", err)
+				log.Error("error sending relay status: ", err)
 			}
 		}
 	} else {
-		fmt.Println("error getting Circuits:", err)
+		log.Error("error getting Circuits: ", err)
 	}
 }
 
@@ -155,7 +172,7 @@ func analyzeParentRelayStateOfCircuit(circuitRelays []CircuitRelays) string {
 			}
 		}
 	} else {
-		fmt.Println("error getting RelayStatus:", err)
+		log.Error("error getting relay status:", err)
 	}
 	return DISABLE
 }
